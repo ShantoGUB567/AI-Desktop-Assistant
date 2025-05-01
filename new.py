@@ -1,4 +1,5 @@
 import win32com.client
+import os
 
 def say(text):
     speaker = win32com.client.Dispatch("SAPI.SpVoice")
@@ -12,5 +13,10 @@ def say(text):
 
 if __name__ == "__main__":
     print("Shanto")  # just printing something
-    say("Hello Shanto, I am your AI desktop assistant.")
-    
+    # say("Hello Shanto, I am your AI desktop assistant.")
+    # os.system("start notepad")
+    # os.system("start calc")
+    # os.system("start outlookcal:")
+    # os.system("start ms-clock:")
+    # os.system("start ms-settings:")
+    os.system("start code")
