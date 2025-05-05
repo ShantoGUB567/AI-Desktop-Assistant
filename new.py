@@ -1,5 +1,6 @@
 import win32com.client
 import os
+from main import chat
 
 def say(text):
     speaker = win32com.client.Dispatch("SAPI.SpVoice")
@@ -19,4 +20,5 @@ if __name__ == "__main__":
     # os.system("start outlookcal:")
     # os.system("start ms-clock:")
     # os.system("start ms-settings:")
-    os.system("start code")
+    # os.system("start code")
+    chat("how are you")
