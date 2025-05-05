@@ -3,6 +3,7 @@ import os
 import win32com.client
 import webbrowser
 import datetime
+import requests
 
 def say(text):
     # os. system(f"say{text}")
@@ -20,6 +21,23 @@ def takeCommand():
             return query
         except Exception as e:
             return "Some Error Occurred.. Sorry for that... "
+
+def ai(prompt):
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": "Bearer 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",
+        "Content-Type": "application/json",
+        # "HTTP-Referer": "<your-site-url>",  # optional
+        # "X-Title": "<your-site-name>",      # optional
+    }
+    data = {
+        "model": "deepseek/deepseek-r1:free",
+        "messages": [{"role": "user", "content": "talk about CSE?"}]
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    print(response.json()["choices"][0]["message"]["content"])
+
 
 if __name__ == "__main__":
     print("Shanto")
