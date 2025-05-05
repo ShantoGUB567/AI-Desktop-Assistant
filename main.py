@@ -29,30 +29,71 @@ def ai(prompt):
     headers = {
         "Authorization": f"Bearer {apikey}",
         "Content-Type": "application/json",
-        # "HTTP-Referer": "<your-site-url>",  # optional
-        # "X-Title": "<your-site-name>",      # optional
     }
     data = {
         "model": "deepseek/deepseek-r1:free",
-        "messages": [{"role": "user", "content": f"{prompt} (in one line)"}]
+        "messages": [{"role": "user", "content": f"{prompt}"}]
     }
 
     response = requests.post(url, headers=headers, json=data)
-    print("here is result")
-    print(response.json()["choices"][0]["message"]["content"])
-    text += response.json()["choices"][0]["message"]["content"]
-    if not os.path.exists("AI_Result"):
-        os.makedirs("AI_Result")
 
-    with open(f"AI_Result/{''.join(prompt.split("AI")[1:]).strip()}.txt", "w") as f:
-        f.write(response.json()["choices"][0]["message"]["content"])
+    if response.status_code != 200:
+        print("API error:", response.status_code)
+        print(response.text)
+        say("Sorry, API failed.")
+        return
+
+    res_json = response.json()
+    if "choices" not in res_json:
+        print("Invalid response:", res_json)
+        say("Sorry, no valid AI response found.")
+        return
+
+    reply = res_json["choices"][0]["message"]["content"]
+    print("AI Response:", reply)
+
+    # print("I am thinking...")
+    # url = "https://openrouter.ai/api/v1/chat/completions"
+    # headers = {
+    #     "Authorization": f"Bearer {apikey}",
+    #     "Content-Type": "application/json",
+    #     # "HTTP-Referer": "<your-site-url>",  # optional
+    #     # "X-Title": "<your-site-name>",      # optional
+    # }
+    # data = {
+    #     "model": "deepseek/deepseek-r1:free",
+    #     "messages": [{"role": "user", "content": f"{prompt} (in one line)"}]
+    # }
+
+    # response = requests.post(url, headers=headers, json=data)
+    # if response.status_code != 200:
+    #     print("API error:", response.status_code, response.text)
+    #     say("Sorry, API failed.")
+    #     return
+
+    # res_json = response.json()
+    # if "choices" not in res_json:
+    #     print("Unexpected response:", res_json)
+    #     say("Sorry, invalid AI response.")
+    #     return
+    
+    # print("here is result")
+    # print(response.json()["choices"][0]["message"]["content"])
+
+    # text += response.json()["choices"][0]["message"]["content"]
+
+    # if not os.path.exists("AI_Result"):
+    #     os.makedirs("AI_Result")
+
+    # with open(f"AI_Result/{''.join(prompt.split("AI")[1:]).strip()}.txt", "w") as f:
+    #     f.write(response.json()["choices"][0]["message"]["content"])
 
     print("done")
 
 chatStr = ""
 def chat(query):
     global chatStr
-    print(chatStr)
+    # print(chatStr)
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {apikey}",
@@ -62,19 +103,30 @@ def chat(query):
     }
     data = {
         "model": "deepseek/deepseek-r1:free",
-        "messages": [{"role": "user", "content": f"Shanto: {query}\nPUKKI: "}]
+        "messages": [{"role": "user", "content": f"Shanto: {query}\nPUKKI: (1/2 line)"}]
     }
 
     response = requests.post(url, headers=headers, json=data)
+    if response.status_code != 200:
+        print("API error:", response.status_code, response.text)
+        say("Sorry, API failed.")
+        return
+
+    res_json = response.json()
+    if "choices" not in res_json:
+        print("Unexpected response:", res_json)
+        say("Sorry, invalid AI response.")
+        return
     print("here is result")
+    print(response.json()["choices"][0]["message"]["content"])
     say(response.json()["choices"][0]["message"]["content"])
     chatStr += response.json()["choices"][0]["message"]["content"]
     return response.json()["choices"][0]["message"]["content"]
 
-    with open(f"AI_Result/{''.join(prompt.split("AI")[1:]).strip()}.txt", "w") as f:
-        f.write(response.json()["choices"][0]["message"]["content"])
+    # with open(f"AI_Result/{''.join(prompt.split("AI")[1:]).strip()}.txt", "w") as f:
+    #     f.write(response.json()["choices"][0]["message"]["content"])
 
-    print("done")
+    # print("done")
 
 if __name__ == "__main__":
     print("Shanto")
@@ -136,7 +188,7 @@ if __name__ == "__main__":
 
         elif "using AI".lower() in query.lower():
             say("Thinking...")
-            ai(prompt=query)
+            ai(query)
         
         elif "nice" in query.lower() or "good" in query.lower() or "josh" in query.lower():
             say("Thank you sir .. ")

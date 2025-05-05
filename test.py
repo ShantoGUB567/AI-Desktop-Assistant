@@ -10,7 +10,7 @@ headers = {
 }
 data = {
     "model": "deepseek/deepseek-r1:free",
-    "messages": [{"role": "user", "content": "talk about CSE?"}]
+    "messages": [{"role": "user", "content": "talk about CSE? 3 line"}]
 }
 
 response = requests.post(url, headers=headers, json=data)
