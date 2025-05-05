@@ -4,6 +4,7 @@ import win32com.client
 import webbrowser
 import datetime
 import requests
+from config import apikey
 
 def say(text):
     # os. system(f"say{text}")
@@ -23,21 +24,57 @@ def takeCommand():
             return "Some Error Occurred.. Sorry for that... "
 
 def ai(prompt):
+    print("I am thinking...")
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
-        "Authorization": "Bearer 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",
+        "Authorization": f"Bearer {apikey}",
         "Content-Type": "application/json",
         # "HTTP-Referer": "<your-site-url>",  # optional
         # "X-Title": "<your-site-name>",      # optional
     }
     data = {
         "model": "deepseek/deepseek-r1:free",
-        "messages": [{"role": "user", "content": "talk about CSE?"}]
+        "messages": [{"role": "user", "content": f"{prompt} (in one line)"}]
     }
 
     response = requests.post(url, headers=headers, json=data)
+    print("here is result")
     print(response.json()["choices"][0]["message"]["content"])
+    text += response.json()["choices"][0]["message"]["content"]
+    if not os.path.exists("AI_Result"):
+        os.makedirs("AI_Result")
 
+    with open(f"AI_Result/{''.join(prompt.split("AI")[1:]).strip()}.txt", "w") as f:
+        f.write(response.json()["choices"][0]["message"]["content"])
+
+    print("done")
+
+chatStr = ""
+def chat(query):
+    global chatStr
+    print(chatStr)
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {apikey}",
+        "Content-Type": "application/json",
+        # "HTTP-Referer": "<your-site-url>",  # optional
+        # "X-Title": "<your-site-name>",      # optional
+    }
+    data = {
+        "model": "deepseek/deepseek-r1:free",
+        "messages": [{"role": "user", "content": f"Shanto: {query}\nPUKKI: "}]
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    print("here is result")
+    say(response.json()["choices"][0]["message"]["content"])
+    chatStr += response.json()["choices"][0]["message"]["content"]
+    return response.json()["choices"][0]["message"]["content"]
+
+    with open(f"AI_Result/{''.join(prompt.split("AI")[1:]).strip()}.txt", "w") as f:
+        f.write(response.json()["choices"][0]["message"]["content"])
+
+    print("done")
 
 if __name__ == "__main__":
     print("Shanto")
@@ -96,6 +133,10 @@ if __name__ == "__main__":
         elif "the time" in query.lower():
             time = datetime.datetime.now().strftime("%H:%M:%S")
             say(f"The time is {time}")
+
+        elif "using AI".lower() in query.lower():
+            say("Thinking...")
+            ai(prompt=query)
         
         elif "nice" in query.lower() or "good" in query.lower() or "josh" in query.lower():
             say("Thank you sir .. ")
@@ -103,6 +144,9 @@ if __name__ == "__main__":
         elif "exit" in query.lower() or "close" in query.lower() or "stop" in query.lower():
             say("Clossing the Project. Thank you..")
             exit()
+
+        else:
+            chat(query)
         
         # else:
         #     print("Nothing matched. Waiting for next command.")
